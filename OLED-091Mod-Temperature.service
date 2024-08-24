@@ -1,0 +1,32 @@
+[Unit]
+Description=Daemon that updates the OLED with the temperature provided
+After=network.target
+
+[Service]
+User=alex
+WorkingDirectory=/home/alex/scripts/OLED-091Mod-Temperature
+ExecStart=/usr/bin/python /home/alex/scripts/OLED-091Mod-Temperature/oled_temperature_daemon.py -i 60 -a 127.0.0.1 -b 5000 -c 127.0.0.1 -d 5001
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+
+
+#[Unit]
+#Description=My Python Daemon
+#After=network.target
+#
+#[Service]
+#Type=simple
+#User=yourusername
+#WorkingDirectory=/path/to/your/daemon
+#ExecStart=/usr/bin/python3 /path/to/your/daemon/daemon_script.py
+#Restart=on-failure
+#RestartSec=5
+#StandardOutput=syslog
+#StandardError=syslog
+#SyslogIdentifier=mydaemon
+#
+#[Install]
+#WantedBy=multi-user.target
+

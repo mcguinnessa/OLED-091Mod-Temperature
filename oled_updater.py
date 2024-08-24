@@ -29,6 +29,7 @@ class OledUpdater:
 
       # width, height, address
       self.display = adafruit_ssd1306.SSD1306_I2C(DISPLAY_WIDTH, DISPLAY_HEIGHT, i2c)
+      #self.display = adafruit_ssd1306.SSD1306_I2C(DISPLAY_WIDTH, DISPLAY_HEIGHT, 0x33)
 
       self.clear_display()
 
