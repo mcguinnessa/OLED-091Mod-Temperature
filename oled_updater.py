@@ -9,6 +9,7 @@ from board import SCL, SDA
 import busio
 from PIL import Image, ImageDraw, ImageFont
 import adafruit_ssd1306
+import logging
 
 DISPLAY_WIDTH  = 128 
 DISPLAY_HEIGHT = 32 
@@ -48,7 +49,7 @@ class OledUpdater:
        
       now = datetime.now()
       dt_string = now.strftime("%d/%m/%y %H:%M:%S")
-      print("date and time =", dt_string)
+      logging.debug("date and time =" + str(dt_string))
 
       self.drawing_obj.text((LHS_PADDING, TOP_PADDING + FIRST_LINE_OFFSET), ft_temp + "°C", font=self.font_large, fill=255)
       self.drawing_obj.text((LHS_PADDING, TOP_PADDING + SECOND_LINE_OFFSET), dt_string +"  " + room_temp + "°C", font=self.font_small, fill=255)

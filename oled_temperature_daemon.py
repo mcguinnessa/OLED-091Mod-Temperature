@@ -5,6 +5,7 @@ import signal
 import sys
 import requests
 import getopt
+import logging
 
 from oled_updater import OledUpdater
 
@@ -32,11 +33,11 @@ class Daemon:
          room_temp = self.get_room_temp()
          self.oled.update_display(ft_temp, room_temp)
 
-         print("Sleeping for " + str(self.interval) + "s")
+         logging.debug("Sleeping for " + str(self.interval) + "s")
          time.sleep(self.interval)
 
    def stop(self, signum, frame):
-      print("OLED Daemon is stopping...")
+      logging.info("OLED Daemon is stopping...")
       self.running = False
 
    def get_ft_temp(self):
@@ -46,7 +47,7 @@ class Daemon:
       if ft_resp.status_code == 200:
          ft_json_data = ft_resp.json()
          ft_temp = "%.1f" % ft_json_data['value']
-         print("FT Temp:" + str(ft_temp))
+         logging.debug("FT Temp:" + str(ft_temp))
 
       return ft_temp
 
@@ -58,19 +59,24 @@ class Daemon:
          r_json_data = room_resp.json()
          #print("ROOM:" + str(r_json_data))
          room_temp = "%.0f" % r_json_data['value']
-         print("ROOM Temp:" + str(room_temp))
+         logging.debug("ROOM Temp:" + str(room_temp))
       return room_temp 
 
+
+def usage():
+   print('<oled_temperature_daemon.py -i>')
+
+
+
+#################################################################################################
+#
+# MAIN
+#
+#################################################################################################
 if __name__ == "__main__":
 
-
-#   try:
-#   except getopt.GetoptError:
-#      print('<oled_temperature_daemon.py -i>')
-#      sys.exit(2)
-
    try:
-      opts, args = getopt.getopt(sys.argv[1:],"i:a:b:c:d:",["interval=", "--ds18b20_host", "--ds18b20_port", "--dht11_host", "--dht11_port"])
+      opts, args = getopt.getopt(sys.argv[1:],"i:a:b:c:d:l:",["interval=", "--ds18b20_host=", "--ds18b20_port=", "--dht11_host=", "--dht11_port=", "--loglevel="])
       #opts, args = getopt.getopt(argv, "li:f:", ["log="])
    except getopt.GetoptError:
       usage()
@@ -81,31 +87,50 @@ if __name__ == "__main__":
    ds18b20_port=""
    dht11_host=""
    dht11_port=""
+   loglevel = "DEBUG"
 
    for opt, arg in opts:
       if opt == '-h':
          print('<oled_temperature_daemon.py -i>')
          sys.exit()
       elif opt in ("-i", "--interval"):
-         print("OPT:" + str(arg))
          interval=int(arg)
+         print("Interval:" + str(interval))
       elif opt in ("-a", "--ds18b20_host"):
-         print("OPT:" + str(arg))
          ds18b20_host=str(arg)
+         print("DS18B20 Host:" + str(ds18b20_host))
       elif opt in ("-b", "--ds18b20_port"):
-         print("OPT:" + str(arg))
          ds18b20_port=str(arg)
+         print("DS18B20 Port:" + str(ds18b20_port))
       elif opt in ("-c", "--dht11_host"):
-         print("OPT:" + str(arg))
          dht11_host=str(arg)
+         print("DHT11 Host:" + str(dht11_host))
       elif opt in ("-d", "--dht11_port"):
-         print("OPT:" + str(arg))
          dht11_port=str(arg)
+         print("DHT11 Port:" + str(dht11_port))
+      elif opt in ("-l", "--loglevel"):
+         loglevel=str(arg)
+         print("Log Level:" + str(loglevel))
+
+
+   numeric_log_level = getattr(logging, loglevel, None)
+
+#   logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s', filename='/var/log/film_manager/upload_from_files.log', filemode='w', level=logging.DEBUG)
+#   logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s', filename='/var/log/fishtank/oled_daemon.log", filemode='w', level=logging.DEBUG)
+   logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s', filename='./oled_daemon.log', filemode='w', level=logging.DEBUG)
+   logging.getLogger("smbprotocol").setLevel(logging.ERROR)
+   console = logging.StreamHandler()
+
+   #console.setLevel(logging.INFO)
+   console.setLevel(logging.DEBUG)
+
+   formatter = logging.Formatter('%(levelname)-8s %(message)s')
+   console.setFormatter(formatter)
 
    try:  
       daemon = Daemon(ds18b20_host, ds18b20_port, dht11_host, dht11_port, interval=interval)
-      print("OLED Daemon is starting...")
+      logging.info("OLED Daemon is starting...")
       daemon.start()
-      print("OLED Daemon has stopped.")
+      logging.info("OLED Daemon has stopped.")
    except Exception as e:
-      print("OLED Daemon failed due to " + str(e))
+      logging.info("OLED Daemon failed due to " + str(e))
