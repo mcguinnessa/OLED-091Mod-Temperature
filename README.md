@@ -1,6 +1,8 @@
 # OLED-091Mod-Temperature
 Daemon for displaying the temperature on a 0.91 LED display
 
+Needs to enable SPI and IC2 in raspi-config
+
 
 #Create Service
 create link to service file in /etc/systemd/system/OLED-091Mod-Temperature.service

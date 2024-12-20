@@ -5,7 +5,7 @@ After=network.target
 [Service]
 User=alex
 WorkingDirectory=/home/alex/scripts/OLED-091Mod-Temperature
-ExecStart=/usr/bin/python /home/alex/scripts/OLED-091Mod-Temperature/oled_temperature_daemon.py -i 60 -a 127.0.0.1 -b 5000 -c 127.0.0.1 -d 5001
+ExecStart=/home/alex/scripts/OLED-091Mod-Temperature/.venv/bin/python /home/alex/scripts/OLED-091Mod-Temperature/oled_temperature_daemon.py -i 60 -a 127.0.0.1 -b 5000 -c 127.0.0.1 -d 5001
 Restart=always
 
 [Install]
